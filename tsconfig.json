@@ -31,6 +31,13 @@
       "@hooks": ["./src/hooks"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/api/auth/ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "src/app/api/auth/ts",
+    "src/types" 
+  ],
   "exclude": ["node_modules"]
 }
