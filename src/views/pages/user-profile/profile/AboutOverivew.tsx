@@ -1,15 +1,17 @@
 // ** MUI Components
+import { Icon } from '@iconify/react'
 import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
-import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
+import Typography from '@mui/material/Typography'
+import { LuUserRound } from "react-icons/lu"
+import { PiCrownSimple } from "react-icons/pi";
+import { rgbaToHex } from 'src/@core/utils/rgba-to-hex'
 
 // ** Icon Imports
-import Icon from '@core/components/icon'
 
 // ** Types
-import { ProfileTeamsType, ProfileTabCommonType } from 'src/@fake-db/types'
+import { ProfileTabCommonType, ProfileTeamsType } from 'src/@fake-db/types'
 
 interface Props {
   teams: ProfileTeamsType[]
@@ -17,28 +19,55 @@ interface Props {
   contacts: ProfileTabCommonType[]
   overview: ProfileTabCommonType[]
 }
+const greyHexColor = rgbaToHex("rgba(51, 48, 60, 0.6)")
+
 
 const renderList = (arr: ProfileTabCommonType[]) => {
+
   if (arr && arr.length) {
     return arr.map((item, index) => {
+
       return (
         <Box
           key={index}
           sx={{
             display: 'flex',
-            alignItems: 'center',
+            // alignItems: 'center',
+            flexDirection: "column",
+            gap: "10px",
             '&:not(:last-of-type)': { mb: 3 },
-            '& svg': { color: 'text.secondary' }
+            '& svg': { color: greyHexColor }
           }}
         >
-          <Icon fontSize='1.25rem' icon={item.icon} />
 
-          <Typography sx={{ mx: 2, fontWeight: 500, color: 'text.secondary' }}>
-            {`${item.property.charAt(0).toUpperCase() + item.property.slice(1)}:`}
-          </Typography>
-          <Typography sx={{ color: 'text.secondary' }}>
-            {item.value.charAt(0).toUpperCase() + item.value.slice(1)}
-          </Typography>
+          <div className='flex items-center '>
+            <LuUserRound />
+            <Typography sx={{ mx: 2, fontWeight: 500, color: greyHexColor }}>
+              {`نام:`}
+            </Typography>
+            <Typography sx={{ color: greyHexColor }}>
+              {item?.userFullName}
+            </Typography>
+          </div>
+          <div className='flex items-center '>
+            <Icon icon='tabler:phone' />
+            <Typography sx={{ mx: 2, fontWeight: 500, color: greyHexColor }}>
+              {`شماره تماس:`}
+            </Typography>
+            <Typography sx={{ color: greyHexColor }}>
+              {item?.phoneNumber}
+            </Typography>
+          </div>
+          <div className='flex items-center'>
+            <PiCrownSimple />
+            <Typography sx={{ mx: 2, fontWeight: 500, color: greyHexColor }}>
+              {`نقش کاربر:`}
+            </Typography>
+
+            {item?.roles?.map((item) => <Typography sx={{ color: greyHexColor }}> {item}</Typography>)}
+          </div>
+
+
         </Box>
       )
     })
@@ -47,77 +76,32 @@ const renderList = (arr: ProfileTabCommonType[]) => {
   }
 }
 
-const renderTeams = (arr: ProfileTeamsType[]) => {
-  if (arr && arr.length) {
-    return arr.map((item, index) => {
-      return (
-        <Box
-          key={index}
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            '&:not(:last-of-type)': { mb: 3 },
-            '& svg': { color: `${item.color}.main` }
-          }}
-        >
-          <Icon fontSize='1.25rem' icon={item.icon} />
 
-          <Typography sx={{ mx: 2, fontWeight: 500, color: 'text.secondary' }}>
-            {item.property.charAt(0).toUpperCase() + item.property.slice(1)}
-          </Typography>
-          <Typography sx={{ color: 'text.secondary' }}>
-            {item.value.charAt(0).toUpperCase() + item.value.slice(1)}
-          </Typography>
-        </Box>
-      )
-    })
-  } else {
-    return null
-  }
-}
 
 const AboutOverivew = (props: Props) => {
   const { teams, about, contacts, overview } = props
-
+  const titleColor = rgbaToHex("rgba(51, 48, 60, 0.38)")
   return (
-    <Grid container spacing={6}>
-      <Grid item xs={12}>
-        <Card>
-          <CardContent>
-            <Box sx={{ mb: 6 }}>
-              <Typography variant='body2' sx={{ mb: 4, color: 'text.disabled', textTransform: 'uppercase' }}>
-                About
-              </Typography>
-              {renderList(about)}
-            </Box>
-            <Box sx={{ mb: 6 }}>
-              <Typography variant='body2' sx={{ mb: 4, color: 'text.disabled', textTransform: 'uppercase' }}>
-                Contacts
-              </Typography>
-              {renderList(contacts)}
-            </Box>
-            <div>
-              <Typography variant='body2' sx={{ mb: 4, color: 'text.disabled', textTransform: 'uppercase' }}>
-                Teams
-              </Typography>
-              {renderTeams(teams)}
-            </div>
-          </CardContent>
-        </Card>
-      </Grid>
-      <Grid item xs={12}>
-        <Card>
-          <CardContent>
-            <div>
-              <Typography variant='body2' sx={{ mb: 4, color: 'text.disabled', textTransform: 'uppercase' }}>
-                Overview
-              </Typography>
-              {renderList(overview)}
-            </div>
-          </CardContent>
-        </Card>
-      </Grid>
-    </Grid>
+
+    <Card className='w-96'>
+      <CardContent>
+        <Box sx={{ mb: 6 }}>
+          <div className='flex mb-4 gap-1 items-center'>
+
+            <Typography variant='body2' sx={{ textTransform: 'uppercase',fontSize:"18px",textAlign:"center"}}>
+              اطلاعات کاربری
+            </Typography>
+          </div>
+
+          {renderList([about])}
+        </Box>
+
+
+      </CardContent>
+    </Card>
+
+
+
   )
 }
 

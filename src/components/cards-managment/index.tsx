@@ -1,113 +1,164 @@
 "use client"
 
-import VisibilityIcon from "@mui/icons-material/Visibility"
-import IconButton from "@mui/material/IconButton"
-import { useRouter } from "next/navigation"
+import { Card } from "@mui/material"
 import { useEffect, useMemo, useState } from "react"
-import { useDispatch } from "react-redux"
-import { GetAccountsData } from "src/@api/accounts"
-import { setSelectedId } from "src/store/apps/accounts"
-import TableColumns from "../dataGrid"
 import toast from "react-hot-toast"
+import { PiMicrosoftExcelLogoDuotone } from "react-icons/pi"
+import { useSelector } from "react-redux"
+import { GetAccountCards } from "src/@api/cards/account-cards"
+import { ExportExcel } from "src/@api/cards/excel"
+import { GetMediaTypes } from "src/@api/cards/media-types"
+import ExcelButton from "src/@core/components/excell-export"
+import StatusChip from "src/@core/components/mui/chip/status-chip"
+import CustomTextField from "src/@core/components/text-fields"
+import { downloadBase64File } from "src/@utils/download-excel"
+import { getStatusColor } from "src/@utils/get-status-color"
+import { RootState } from "src/store"
+import CustomTableColumns from "../datagird/customDataGrid"
+import CurrencyFilter from "../filters/currency"
+import MediaTypesCard from "./components/media-types-cards"
+import StatusFilter from "./components/status-filter"
 
 export default function CardsManagmentDataGrid() {
-    const [cardsList, setCardsList] = useState({
-        count: 0,
-        list: []
-    })
-
-    const [pagination, setPagination] = useState({
-        pageNumber: 0,
-        pageSize: 10
-    })
-
+    const [cardsList, setCardsList] = useState({ count: 0, list: [] })
+    const [selectedMedia, setSelectedMedia] = useState(0)
+    const [mediaTypes, setMediaTypes] = useState([])
     const [loading, setLoading] = useState(false)
-    const router = useRouter()
-    const dispatch = useDispatch()
+    const [currency, setCurrency] = useState("")
+    const [status, setStatus] = useState("")
+    const [pagination, setPagination] = useState({ pageNumber: 0, pageSize: 10 })
+    const [excelLoading, setExcelLoading] = useState(false)
+    const [searchCard, setSearchCard] = useState("") // 🔍 جستجو بر اساس شماره کارت
+    const selectedId = useSelector((state: RootState) => state.account.selectedId)
 
+    // ✅ 1. فقط یک بار media types رو بگیر
     useEffect(() => {
-        let isMounted = true
-
-        const fetchData = async () => {
-            setLoading(true)
-            const postedData = {
-                firstName: null,
-                lastName: null,
-                accountNumber: null,
-                currencyCode: null,
-                serialNumber: null,
-                pageNumber: pagination.pageNumber,
-                pageSize: pagination.pageSize,
-            }
-
+        const fetchMediaTypes = async () => {
             try {
-                const res = await GetAccountsData(postedData)
-                if (isMounted) {
-                    setCardsList({ count: res.count, list: res.list })
+                const mediaRes = await GetMediaTypes()
+                const types = mediaRes?.mediaTypes || mediaRes || []
+                setMediaTypes(types)
+                if (types.length > 0) {
+                    setSelectedMedia(types[0].code)
                 }
             } catch (err) {
-                toast.error("خطایی رخ داده است")
+                toast.error("خطا در دریافت نوع رسانه‌ها")
+            }
+        }
+        fetchMediaTypes()
+    }, [])
+
+    // ✅ 2. هر بار که فیلترها یا شماره صفحه تغییر کرد → کارت‌ها رو بگیر
+    useEffect(() => {
+        if (!selectedMedia || !selectedId) return
+
+        let isMounted = true
+        const fetchCards = async () => {
+            try {
+                setLoading(true)
+                const postedData = {
+                    serialNumber: searchCard?.trim() || null,
+                    accountNumber: "",
+                    mediaTypeCode: selectedMedia,
+                    mediaStatusTypeCode: status,
+                    issueDate: null,
+                    currencyTypeCode: currency
+                }
+                const cardsRes = await GetAccountCards(postedData)
+                if (isMounted) {
+                    setCardsList({ count: cardsRes.count, list: cardsRes.list })
+                }
+            } catch (err) {
+                toast.error("خطایی در دریافت کارت‌ها رخ داده است")
             } finally {
                 if (isMounted) setLoading(false)
             }
         }
 
-        fetchData()
-
+        fetchCards()
         return () => {
             isMounted = false
         }
-    }, [pagination])
-
+    }, [selectedId, pagination.pageNumber, selectedMedia, searchCard, currency, status])
 
     const columns = useMemo(() => [
-        { field: "number", headerName: "شماره حساب", flex: 1, align: "center", headerAlign: "center" },
-        { field: "identifier", headerName: "شناسه شخص", flex: 1, align: "center", headerAlign: "center" },
-        { field: "accountOwner", headerName: "نام مشتری", flex: 1, align: "center", headerAlign: "center" },
-        { field: "financialProductType", headerName: "نوع حساب", flex: 1, align: "center", headerAlign: "center" },
-        { field: "availableBalance", headerName: "موجودی", flex: 1, align: "center", headerAlign: "center" },
-        { field: "blockBalance", headerName: "موجودی مسدودی", flex: 1, align: "center", headerAlign: "center" },
-        { field: "currency", headerName: "ارز", flex: 1, align: "center", headerAlign: "center" },
-        { field: "status", headerName: "وضعیت", flex: 1, align: "center", headerAlign: "center" },
+        { field: "serialNumber", headerName: "شماره کارت", flex: 1, align: "center", headerAlign: "center" },
+        { field: "currencyType", headerName: "ارز", flex: 1, align: "center", headerAlign: "center" },
+        { field: "expiryDate", headerName: "تاریخ انقضا", flex: 1, align: "center", headerAlign: "center" },
         {
-            field: "actions",
-            headerName: "عملیات",
-            align: "center",
-            headerAlign: "center",
-            flex: 0.5,
-            renderCell: (params: any) => (
-                <IconButton
-                    color="primary"
-                    onClick={() => {
-                        router.push("/account-managment/detail")
-                        dispatch(setSelectedId(params.row.number))
-                    }}
-                >
-                    <VisibilityIcon />
-                </IconButton>
+            field: "status", headerName: "وضعیت", flex: 1, align: "center", headerAlign: "center",
+            renderCell: (params) => (
+                <div className="mt-2 flex justify-center">
+                    <StatusChip label={params.row.status} skin='light' color={getStatusColor(params.row.status)} />
+                </div>
             )
+        },
+    ], [])
+
+    // 📤 خروجی اکسل
+    const handleExportClick = () => {
+        setExcelLoading(true)
+        const postedData = {
+            serialNumber: searchCard?.trim() || "",
+            accountNumber: selectedId || "",
+            mediaTypeCode: selectedMedia || ""
         }
-    ], [dispatch, router])
-
-
+        ExportExcel(postedData)
+            .then((res) => {
+                downloadBase64File(res.base64Data, res.fileType, res.fileName)
+                setExcelLoading(false)
+            })
+            .catch(() => {
+                setExcelLoading(false)
+                toast.error("دریافت فایل گزارش با خطا مواجه شد")
+            })
+    }
 
     return (
+        <div className="flex flex-col gap-4">
 
-        <>
-
-
-            <TableColumns
-                totalCount={cardsList.count}
-                columns={columns}
-                loading={loading}
-                rows={cardsList.list}
-                rowCount={cardsList.count}
-                pageSize={pagination.pageSize}
-                onPageChange={(newPage) =>
-                    setPagination((prev) => ({ ...prev, pageNumber: newPage }))
-                }
+            <MediaTypesCard
+                mediaTypes={mediaTypes}
+                selectedMedia={selectedMedia}
+                setSelectedMedia={setSelectedMedia}
             />
-        </>
 
+            <Card>
+                <div className="flex justify-between items-center p-6">
+                    <div className="flex items-center gap-4">
+                        <CustomTextField
+                            width={"22rem"}
+                            label="جستجو بر اساس شماره کارت"
+                            value={searchCard}
+                            onChange={(e: any) => setSearchCard(e.target.value)}
+                        />
+                        <CurrencyFilter currency={currency} setCurrency={setCurrency} />
+                        <StatusFilter status={status} setStatus={setStatus} />
+                    </div>
+
+                    <ExcelButton
+                        disabled={!cardsList.list.length}
+                        loading={excelLoading}
+                        onClick={handleExportClick}
+                        width="150px"
+                        startIcon={<PiMicrosoftExcelLogoDuotone />}
+                        label="دانلود گزارش"
+                    />
+                </div>
+
+                <CustomTableColumns
+                    cardTitle=""
+                    totalCount={cardsList.count}
+                    columns={columns}
+                    loading={loading}
+                    rows={cardsList.list}
+                    rowCount={cardsList.count}
+                    pageSize={pagination.pageSize}
+                    onPageChange={(newPage) =>
+                        setPagination((prev) => ({ ...prev, pageNumber: newPage }))
+                    }
+                />
+            </Card>
+        </div>
     )
 }

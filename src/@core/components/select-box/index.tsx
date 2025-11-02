@@ -1,73 +1,82 @@
-"use client"
-
 import React from "react"
+import { Autocomplete, TextField, FormHelperText } from "@mui/material"
 import { styled } from "@mui/material/styles"
-import {
-  Select,
-  MenuItem,
-  SelectProps,
-  FormControl,
-  InputLabel,
-  FormHelperText,
-} from "@mui/material"
 
-// ✅ Custom styled Select
-const StyledSelect = styled(Select)(({ theme }) => ({
-  borderRadius: 12,
-  backgroundColor: "#fff",
-  // width: "260px",
-  fontSize: 14,
-  "& .MuiOutlinedInput-notchedOutline": {
-    borderColor: "#d6d6d6",
+const StyledAutocomplete = styled(Autocomplete)(({ theme }) => ({
+  width: "13.8rem",
+  "& .MuiOutlinedInput-root": {
+    borderRadius: 12,
+    backgroundColor: "#fff",
+    fontSize: 14,
+    "& fieldset": {
+      borderColor: "#d6d6d6",
+    },
+    "&:hover fieldset": {
+      borderColor: theme.palette.primary.main,
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: theme.palette.primary.main,
+      borderWidth: 2,
+    },
   },
-  "&:hover .MuiOutlinedInput-notchedOutline": {
-    borderColor: theme.palette.primary.main,
-  },
-  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderColor: theme.palette.primary.main,
-    borderWidth: 2,
+  "& .MuiAutocomplete-option": {
+    backgroundColor: "transparent !important",
+    "&.Mui-selected": {
+      backgroundColor: "transparent !important",
+    },
+    "&.Mui-selected:hover": {
+      backgroundColor: `${theme.palette.action.hover} !important`,
+    },
+    "&:hover": {
+      backgroundColor: `${theme.palette.action.hover} !important`,
+    },
   },
 }))
-
-// ✅ Custom reusable component
-interface CustomSelectProps extends SelectProps {
+interface CustomAutocompleteProps<T = string | number> {
   label: string
-  value: string | number
-  options: { value: string | number; label: string; description?: string; code?: string }[]
+  value: T | null
+  options: Option<T>[]
   helperText?: string
-  onChange: (value: string | number) => void // ✅ correct type
+  onChange: (value: T | null) => void
   fullWidth?: boolean
+  disabled?: boolean
+  valueKey?: keyof Option<T>
+  labelKey?: keyof Option<T>
 }
 
-
-const CustomSelect: React.FC<CustomSelectProps> = ({
+function CustomAutocomplete<T extends string | number>({
   label,
   options,
   value,
   onChange,
   helperText,
-  fullWidth,
-  ...props
-}) => {
+  fullWidth = true,
+  disabled,
+  valueKey = "value",  // پیش‌فرض value
+  labelKey = "description",  // پیش‌فرض label
+}: CustomAutocompleteProps<T>) {
+
+
+
   return (
-    <FormControl fullWidth={fullWidth}>
-      <InputLabel>{label}</InputLabel>
-      <StyledSelect
-        value={value}
-        label={label}
-        onChange={(e) => onChange(e.target.value)}
-        {...props}
-      >
-        {options.map((opt) => (
-          <MenuItem key={opt.value || opt.code} value={opt.value || opt.code}>
-            {opt.label || opt.description}
-          </MenuItem>
-        ))}
-      </StyledSelect>
+    <div style={{ width: fullWidth ? "100%" : "auto" }}>
+      <StyledAutocomplete
+        noOptionsText="نتیجه‌ای پیدا نشد"
+        options={options}
+        getOptionLabel={(option) => option[labelKey] as string || ""}
+        value={options?.length && options?.find((opt) => opt[valueKey] === value) || null}
+        onChange={(_, newValue) => {
+          onChange(newValue ? (newValue[valueKey] as T) : null)
+        }}
+        isOptionEqualToValue={(option, val) => option[valueKey] === val?.[valueKey]}
+        disableClearable={false}
+        disabled={disabled}
+        renderInput={(params) => <TextField {...params} label={label} variant="outlined" />}
+        fullWidth
+      />
       {helperText && <FormHelperText>{helperText}</FormHelperText>}
-    </FormControl>
+    </div>
   )
 }
 
-
-export default CustomSelect
+export default CustomAutocomplete

@@ -6,25 +6,37 @@ import { useNumberSeprepator } from 'src/hooks/useNumberSeprepator'
 import RechartsPieChart from './chart'
 import Menu from './menu'
 
-export default function AccountBalance({ data }: any) {
+
+interface AccountBalanceProps {
+    data: {
+        monetaryBalance: string | number
+        availableBalance: number | string
+        blockBalance: number | string
+        creditBalance: number | string
+
+    }
+    fetchData?: () => void
+}
+
+export default function AccountBalance({ data, fetchData }: AccountBalanceProps) {
     const theme = useTheme()
     const [visible, setVisible] = useState(true)
     const formattedMonetaryBalance = useNumberSeprepator(data?.monetaryBalance)
     const formattedAvailableBalance = useNumberSeprepator(data?.availableBalance)
     const formattedBlockedBalance = useNumberSeprepator(data?.blockBalance)
-   
+    const formattedCreditBalance = useNumberSeprepator(data?.creditBalance)
 
     return (
-        <Card className='col-span-2 px-px' sx={{ background: 'white', p: 2, ml: '1rem' }}>
+        <Card className='col-span-2 px-5' sx={{ background: 'white', p: 2, ml: '1rem' }}>
             <div className='flex items-center justify-between'>
-                <h2>موجودی کل حساب</h2>
-                <Menu  />
+                <h2>موجودی قابل برداشت</h2>
+                <Menu refetchData={fetchData} blockedBalance={formattedBlockedBalance} />
             </div>
-            <div className='flex justify-between items-center'>
+            <div className='flex px-5 justify-between items-center'>
                 <div>
                     <div style={{ margin: '17px 0' }}>
                         <span style={{ fontSize: '30px' }}>
-                            {visible ? formattedMonetaryBalance : '**************'}
+                            {visible ? formattedAvailableBalance : '*******'}
                         </span>
                         <span style={{ fontSize: '30px' }} className='ml-1'>
                             ریال
@@ -45,15 +57,16 @@ export default function AccountBalance({ data }: any) {
                 </div>
                 {/* ✅ ارسال نسبت‌ها به چارت */}
                 <RechartsPieChart
-                    availableBalance={data?.availableBalance || 0}
+                    availableBalance={data?.monetaryBalance || 0}
                     blockedBalance={data?.blockBalance || 0}
+                    creditBalance={data?.creditBalance || 0}
                 />
             </div>
-            <div className='flex items-center justify-between'>
+            <div className='flex items-center  mx-2 '>
                 <div>
 
 
-                    <div className='flex justify-between items-center '>
+                    <div className='flex  gap-4 items-center '>
                         <div className='flex flex-col'>
                             <div className='flex items-center'>
                                 <span
@@ -66,14 +79,34 @@ export default function AccountBalance({ data }: any) {
                                         marginLeft: '6px'
                                     }}
                                 />
-                                <span className='text-[#2F2B3D66]'>موجودی قابل برداشت</span>
+                                <span className='text-[#2F2B3D66]'>موجودی نقدی</span>
                             </div>
-                            <span style={{ marginTop: '4px' }} className='ml-2 text-[#24B364]'>
-                                {formattedAvailableBalance}
+                            <span style={{ marginTop: '4px' }} className='ml-2 text-center text-[#24B364]'>
+                                {visible ? formattedMonetaryBalance : '*******'}
                             </span>
                         </div>
 
-                        <div style={{ marginRight: "2rem" }} className='flex flex-col'>
+                        <div className='flex flex-col'>
+                            <div className='flex items-center'>
+                                <span
+                                    style={{
+                                        width: '10px',
+                                        height: '10px',
+                                        borderRadius: '50%',
+                                        backgroundColor: '#FFB700',
+                                        display: 'inline-block',
+                                        marginLeft: '6px'
+                                    }}
+                                />
+                                <span className='text-[#2F2B3D66]'>موجودی اعتباری</span>
+                            </div>
+                            <span style={{ marginTop: '4px' }} className='ml-2 text-center text-[#FFB700]'>
+                                {visible ? formattedCreditBalance : '*******'}
+
+                            </span>
+                        </div>
+
+                        <div className='flex flex-col'>
                             <div className='flex items-center'>
                                 <span
                                     style={{
@@ -87,8 +120,9 @@ export default function AccountBalance({ data }: any) {
                                 />
                                 <span className='text-[#2F2B3D66]'>موجودی مسدود شده</span>
                             </div>
-                            <span style={{ marginTop: '4px' }} className='ml-2 text-[#E64449]'>
-                                {formattedBlockedBalance}
+                            <span style={{ marginTop: '4px' }} className='ml-2 text-center text-[#E64449]'>
+                                {visible ? formattedBlockedBalance : '*******'}
+
                             </span>
                         </div>
                     </div>

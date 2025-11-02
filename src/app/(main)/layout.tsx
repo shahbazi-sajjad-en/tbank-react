@@ -18,13 +18,15 @@ import ReactHotToast from "src/@core/styles/libs/react-hot-toast"
 import { SettingsConsumer, SettingsProvider } from "src/@core/context/settingsContext"
 
 // Theme
-import ThemeComponent from "src/@core/theme/ThemeComponent"
+// import ThemeComponent from "src/@core/theme/ThemeComponent"
+import ThemeComponent from '../../@core/theme/ThemeComponent'
 
 
 // Others
-import { SessionProvider } from "next-auth/react"
 import { PersistGate } from "redux-persist/integration/react"
 import themeConfig from "src/configs/themeConfig"
+// import { AuthProvider } from "src/context/AuthContext"
+import { AuthProvider } from '../../context/AuthContext'
 import UserLayout from "src/layouts/UserLayout"
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
@@ -55,26 +57,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 
   return (
-    <html lang="fa" dir="rtl" >
+    <html lang="fa" dir="rtl"  >
       <body dir="rtl" className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <CacheProvider value={clientSideEmotionCache}>
           <Provider store={store}>
             <PersistGate loading={null} persistor={persistor}>
               <SettingsProvider>
-
                 <SettingsConsumer>
 
                   {({ settings }) => (
                     <ThemeComponent settings={settings}>
-                      <Guard authGuard={authGuard} guestGuard={guestGuard}>
-                        <SessionProvider>
-                          <UserLayout>
+                      <AuthProvider>
 
-                            {children}
+                        <Guard authGuard={authGuard} guestGuard={guestGuard}>
 
-                          </UserLayout>
-                        </SessionProvider>
-                      </Guard>
+                            <UserLayout>
+
+                              {children}
+
+                            </UserLayout>
+                        </Guard>
+                      </AuthProvider>
                       <Toaster position={themeConfig.toastPosition} />
                       <ReactHotToast />
                     </ThemeComponent>

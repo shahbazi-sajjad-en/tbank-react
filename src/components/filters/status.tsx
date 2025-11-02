@@ -21,6 +21,8 @@ export default function StatusFilter({ status, setStatus }) {
 
 
             <CustomSelect
+                valueKey="code"
+                labelKey="description"
                 label="وضعیت"
                 options={list}
                 value={status}

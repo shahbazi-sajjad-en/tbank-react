@@ -21,7 +21,7 @@ const WindowWrapper = ({ children }: Props) => {
     },
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [router.route]
+    [router]
   )
 
   if (windowReadyFlag) {

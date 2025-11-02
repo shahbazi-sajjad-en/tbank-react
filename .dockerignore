@@ -1,0 +1,30 @@
+node_modules
+npm-debug.log
+.next
+.git
+.gitignore
+README.md
+.env
+.env.local
+.env.production
+Dockerfile
+.dockerignore
+.docker
+.eslintrc.json
+.prettierrc
+tsconfig.json
+.nextflow
+logs
+// *.log
+.npm
+.pnpm
+.yarn
+.cache
+.DS_Store
+Thumbs.db
+.idea
+.vscode
+// *.tsbuildinfo
+dist
+build
+coverage

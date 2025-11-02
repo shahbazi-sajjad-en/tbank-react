@@ -179,7 +179,7 @@ const NotificationDropdown = (props: Props) => {
             '& .MuiBadge-badge': { top: 4, right: 4, boxShadow: theme => `0 0 0 2px ${theme.palette.background.paper}` }
           }}
         >
-          <Icon fontSize='1.5rem' icon='tabler:bell' />
+          <Icon fontSize='1.7rem' icon='tabler:bell' />
         </Badge>
       </IconButton>
       <Menu

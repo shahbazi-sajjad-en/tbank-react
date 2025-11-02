@@ -19,11 +19,12 @@ interface StatusModalProps {
     open: boolean
     setOpen: React.Dispatch<React.SetStateAction<boolean>>
     isBlock: boolean
+    selectedIdInRow: string
     fetchData?: () => void
 
 }
 
-const StatusModal = ({ open, setOpen, isBlock, fetchData }: StatusModalProps) => {
+const StatusModal = ({ open, setOpen, isBlock, fetchData, selectedIdInRow }: StatusModalProps) => {
     const [value, setValue] = useState<string>('')
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -34,22 +35,22 @@ const StatusModal = ({ open, setOpen, isBlock, fetchData }: StatusModalProps) =>
     )
     const handleSaveStatus = () => {
         const postedData = {
-            accountNumber: selectedId,
-            block: !isBlock,
+            accountNumber: selectedIdInRow && selectedIdInRow != "" ? selectedIdInRow : selectedId,
+            block: isBlock,
             description: value
         }
 
-        ChangeAccountStatus(postedData).then((res) => {
-            setOpen(false)
-            if (fetchData) {
-                fetchData()
-            }
+        ChangeAccountStatus(postedData)
+            .then((res) => {
+                setOpen(false);
+                const postedData: any = { accountNumber: selectedId }
+                fetchData?.(postedData);
+            })
+            .catch((err) => {
+                setOpen(false);
+                toast.error(err?.response?.data?.translate || "خطایی رخ داده است!");
+            });
 
-            // toast.success("تغییر وضعیت خطا با موفقیت انجام شد.")
-        }).catch((err) => {
-            setOpen(false)
-            toast.error(err)
-        })
     }
     const handleClose = () => setOpen(false)
     return (
@@ -65,14 +66,14 @@ const StatusModal = ({ open, setOpen, isBlock, fetchData }: StatusModalProps) =>
                 }
             }}
             open={open} onClose={handleClose}>
-            <DialogTitle id='form-dialog-title'>{isBlock ? "فعالسازی حساب" : "مسدودی حساب"}
+            <DialogTitle id='form-dialog-title'>{!isBlock ? "فعالسازی حساب" : "مسدودی حساب"}
             </DialogTitle>
             <DialogContent sx={{ maxWidth: "100%" }}
             >
                 <DialogContentText >
 
                 </DialogContentText>
-                <TextField fullWidth label='توضیحات' onChange={handleChange} value={value} />
+                <TextField size='small' fullWidth label='توضیحات' onChange={handleChange} value={value} />
 
             </DialogContent>
             <DialogActions sx={{ mb: 2, mr: 4 }} className='dialog-actions-dense '>

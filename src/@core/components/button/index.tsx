@@ -10,8 +10,9 @@ const StyledButton = styled(MuiButton)(({ theme, width }) => ({
     borderRadius: 6,
     textTransform: "none",
     padding: "10px 20px",
+    whiteSpace: "nowrap",
     fontSize: "0.95rem",
-    width: width || "auto",
+    width: width || "10rem",
     fontWeight: 600,
     boxShadow: "none",
     height: "38px",
@@ -38,7 +39,7 @@ const StyledButton = styled(MuiButton)(({ theme, width }) => ({
     },
 
     "&.Mui-disabled": {
-        backgroundColor: theme.palette.action.disabledBackground, 
+        backgroundColor: theme.palette.action.disabledBackground,
         color: theme.palette.action.disabled,
         opacity: 0.7,
         cursor: "not-allowed",
@@ -57,13 +58,13 @@ const StyledButton = styled(MuiButton)(({ theme, width }) => ({
 
 interface CustomButtonProps extends ButtonProps {
     label?: string
-    color?: "primary" | "secondary" | "error" | "success" | "info" | "warning" 
+    color?: "primary" | "secondary" | "error" | "success" | "info" | "warning"
     width?: string
     variant?: "contained" | "outlined" | "text"
 }
 
 
-const CustomButton: React.FC<CustomButtonProps> = ({ label, variant = "contained",color, width, ...props }) => {
+const CustomButton: React.FC<CustomButtonProps> = ({ label, variant = "contained", color, width, ...props }) => {
     return (
         <StyledButton color={color} width={width} variant={variant} {...props}>
             {label}

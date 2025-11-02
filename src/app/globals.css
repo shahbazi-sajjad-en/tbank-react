@@ -29,14 +29,20 @@
   src: url('/fonts/woff/IRANSansXFaNum-DemiBold.woff2') format('woff2');
 }
 
-/* CSS سفارشی */
 html,
 body {
-  font-family: 'IranSans', sans-serif !important;
-  overflow-y: scroll;
-  max-height: 100vh;
+  overflow-y: auto;
+  height: 100vh;
 }
 
+
 #__next {
-  height: 100vh;
+  height: 100%;
+}
+
+
+
+
+h1 {
+  font-size: 20px !important;
 }

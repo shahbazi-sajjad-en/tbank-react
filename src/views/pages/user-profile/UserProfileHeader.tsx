@@ -33,11 +33,11 @@ const UserProfileHeader = () => {
   // ** State
   const [data, setData] = useState<ProfileHeaderType | null>(null)
 
-  useEffect(() => {
-    axios.get('/pages/profile-header').then(response => {
-      setData(response.data)
-    })
-  }, [])
+  // useEffect(() => {
+  //   axios.get('/pages/profile-header').then(response => {
+  //     setData(response.data)
+  //   })
+  // }, [])
 
   const designationIcon = data?.designationIcon || 'tabler:briefcase'
 

@@ -13,12 +13,13 @@ export default function CurrencyFilter({ currency, setCurrency }) {
         fetchList()
     }, [])
 
+
     return (
         <div>
 
-
             <CustomSelect
                 label="ارز"
+                valueKey="code"
                 options={list}
                 value={currency}
                 onChange={(value) => setCurrency(value)}

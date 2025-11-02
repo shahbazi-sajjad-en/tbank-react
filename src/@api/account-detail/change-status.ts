@@ -6,8 +6,14 @@ interface DataType {
   description: string;
 }
 
-export const ChangeAccountStatus = (data: DataType) => {
-  return httpservice
-    .post("/financial/change-account-status", data)
-    .then((res) => res.data);
+export const ChangeAccountStatus = async (data: DataType) => {
+  try {
+    const res = await httpservice.post(
+      "/financial/change-account-status",
+      data
+    );
+    return res.data;
+  } catch (err: any) {
+    throw err;
+  }
 };

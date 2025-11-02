@@ -13,7 +13,6 @@ const accountSlice = createSlice({
   initialState,
   reducers: {
     setSelectedId: (state, action: PayloadAction<string>) => {
-   
       state.selectedId = action.payload
     }
   }

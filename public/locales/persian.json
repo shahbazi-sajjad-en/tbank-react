@@ -1,8 +1,8 @@
 {
-  "AccountManagment": "مدیریت حساب",
-  "CardManagment": "مدیریت کارت ها",
+  "AccountManagment": "مدیریت حساب‌ها",
+  "CardManagment": "مدیریت کارت‌ها",
   "CustomerManagment": "مدیریت مشتریان ",
-  "transactions": "تراکنش ها",
   "reports": "گزارشات",
-  "loanManagement": "مدیریت تسهیلات"
+  "loanManagement": "مدیریت تسهیلات",
+  "transactions":"تراکنش‌ها"
 }

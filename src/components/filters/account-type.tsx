@@ -4,8 +4,10 @@ import CustomSelect from 'src/@core/components/select-box'
 
 export default function AccountTypeFilter({ type, setType }) {
     const [list, setList] = useState([])
+
     const fetchList = () => {
         GetAccountTypeList().then((res) => {
+
             setList(res)
         }).catch((err) => err)
     }
@@ -13,14 +15,16 @@ export default function AccountTypeFilter({ type, setType }) {
     useEffect(() => {
         fetchList()
     }, [])
-    const handleChange = (value :string | number) => {
+
+    const handleChange = (value) => {
         setType(value)
-        console.log(value)
     }
+
     return (
         <div>
             <CustomSelect
                 label="نوع حساب"
+                valueKey="code"
                 options={list}
                 value={type}
                 onChange={handleChange}

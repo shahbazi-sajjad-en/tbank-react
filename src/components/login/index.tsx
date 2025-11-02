@@ -1,5 +1,5 @@
 'use client'
-
+import axios from "axios";
 import { zodResolver } from '@hookform/resolvers/zod'
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined'
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined'
@@ -10,15 +10,17 @@ import FormControl from '@mui/material/FormControl'
 import InputAdornment from '@mui/material/InputAdornment'
 import { styled, useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
-import { signIn } from "next-auth/react"
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
+import { Login } from 'src/@api/login'
 import CustomButton from 'src/@core/components/button'
 import CustomTextField from 'src/@core/components/text-fields'
 import themeConfig from 'src/configs/themeConfig'
 import AuthIllustrationV1Wrapper from 'src/views/pages/auth/AuthIllustrationV1Wrapper'
 import { z } from 'zod'
+import { useDispatch } from "react-redux";
+import { setUserData } from "src/store/apps/profile";
 
 // Zod schema
 const loginSchema = z.object({
@@ -33,17 +35,10 @@ const Card = styled(MuiCard)<CardProps>(({ theme }) => ({
     [theme.breakpoints.up('sm')]: { width: '25rem' }
 }))
 
-const LinkStyled = styled(Link)(({ theme }) => ({
-    fontSize: '0.875rem',
-    direction: "rtl",
-    textDecoration: 'none',
-    color: theme.palette.primary.main
-}))
-
-
 
 const LoginV1 = () => {
     const [showPassword, setShowPassword] = useState(false)
+    const [loading, setLoading] = useState(false)
     const [focused, setFocused] = useState(false)
     const [apiError, setApiError] = useState<string | null>(null)
     const { handleSubmit, control, formState: { errors, isValid } } = useForm<LoginFormInputs>({
@@ -54,20 +49,40 @@ const LoginV1 = () => {
 
 
     const theme = useTheme()
+    const router = useRouter();
+    const dispatch = useDispatch()
 
     const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
-        const result = await signIn("credentials", {
-            redirect: false,
-            username: data.userName,
-            password: data.password,
-        });
+        setLoading(true);
+        setApiError(null);
 
-        if (result?.error) {
-            setApiError("نام کاربری یا رمز عبور اشتباه است");
-        } else {
-            window.location.href = "/";
+        try {
+
+
+            const res = await axios.post(
+                "/api/security/auth/login",
+                {
+                    username: data.userName,
+                    password: data.password,
+                    tokenType: "TENANT_BANK",
+                },
+                { withCredentials: true }
+            );
+
+
+
+            if (res?.data.authentication) {
+                router.push("/")
+            } else {
+                setApiError("نام کاربری یا رمز عبور اشتباه است");
+            }
+        } catch (err) {
+            setApiError("خطا در ارتباط با سرور");
+        } finally {
+            setLoading(false);
         }
     };
+
 
     return (
         <Box className='content-center'>
@@ -110,10 +125,9 @@ const LoginV1 = () => {
                             </svg>
                         </Box>
 
-                        <h4 className='text-center'>
+                        <h4 className='text-center mb-4'>
                             ورود به حساب کاربری
                         </h4>
-                        {apiError && <Typography variant='body2' color='error'>{apiError}</Typography>}
 
 
                         <form noValidate onSubmit={handleSubmit(onSubmit)}>
@@ -125,6 +139,7 @@ const LoginV1 = () => {
                                         {...field}
                                         dir="rtl"
                                         fullWidth
+
                                         label='نام کاربری'
                                         error={!!errors.userName}
                                         helperText={errors.userName?.message}
@@ -179,24 +194,27 @@ const LoginV1 = () => {
                                                 }}
                                             />
 
-                                            {errors.password && (
-                                                <Typography sx={{ mt: 2 }} variant='caption' color='error'>
+                                            {/* {errors.password && (
+                                                <Typography sx={{ my: 2 }} variant='caption' color='error'>
                                                     {errors.password.message}
                                                 </Typography>
-                                            )}
+                                            )} */}
                                         </FormControl>
                                     )
                                 }}
                             />
 
-
+                            {/* 
                             <Box sx={{ my: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <LinkStyled href='/forgot-password'>فراموشی رمز عبور</LinkStyled>
 
-                            </Box>
+                            </Box> */}
+                            {apiError && <Typography variant='body2' className='!mt-3' color='error'>{apiError}</Typography>}
 
-                            <CustomButton disabled={!isValid} label="ورود" width='21rem' type='submit' variant='contained' sx={{ mb: 4, color: "white" }} />
+                            <div className='mt-3'>
+                                <CustomButton loading={loading} disabled={!isValid} label="ورود" width='21rem' type='submit' variant='contained' sx={{ mb: 4, color: "white" }} />
 
+                            </div>
                         </form>
                     </CardContent>
                 </Card>

@@ -10,6 +10,8 @@ RUN npm install --legacy-peer-deps --no-audit
 # سپس تمام کد منبع را کپی کن (شامل فایل‌های پنهان)
 COPY . .
 
+RUN ls -la src/context/
+
 # ساخت برنامه
 RUN npm run build
 
@@ -26,8 +28,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
-EXPOSE 8098
-ENV PORT=8098
+EXPOSE 8090
+ENV PORT=8090
 ENV HOSTNAME=0.0.0.0
 ENV NODE_ENV=production
 

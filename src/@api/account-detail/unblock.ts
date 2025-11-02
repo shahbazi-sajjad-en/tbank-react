@@ -7,10 +7,7 @@ interface DataType {
 }
 
 export const UnBlockBalance = (data: DataType): Promise<any> => {
-  return httpservice
-    .post("/financial/unblock-balance", data)
-    .then((res) => {
-      return res;
-    })
-    .catch((err) => console.log(err));
+  return httpservice.post("/financial/unblock-balance", data).then((res) => {
+    return res;
+  });
 };

@@ -20,10 +20,10 @@ import FormHelperText from '@mui/material/FormHelperText'
 import Icon from '@core/components/icon'
 
 // ** Third Party Imports
-import * as yup from 'yup'
+import { z } from 'zod'
 import toast from 'react-hot-toast'
 import { useForm, Controller } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 interface State {
   showNewPassword: boolean
@@ -37,21 +37,31 @@ const defaultValues = {
   confirmNewPassword: ''
 }
 
-const schema = yup.object().shape({
-  currentPassword: yup.string().min(8).required(),
-  newPassword: yup
-    .string()
-    .min(8)
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
-      'Must contain 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special case character'
-    )
-    .required(),
-  confirmNewPassword: yup
-    .string()
-    .required()
-    .oneOf([yup.ref('newPassword')], 'Passwords must match')
-})
+// Zod schema
+const passwordRegex =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/
+
+const schema = z
+  .object({
+    currentPassword: z
+      .string()
+      .min(8, 'Current password must be at least 8 characters')
+      .nonempty('Current password is required'),
+    newPassword: z
+      .string()
+      .min(8, 'New password must be at least 8 characters')
+      .regex(
+        passwordRegex,
+        'Must contain 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special case character'
+      ),
+    confirmNewPassword: z.string().nonempty('Please confirm your new password')
+  })
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
+    message: 'Passwords must match',
+    path: ['confirmNewPassword']
+  })
+
+type FormValues = z.infer<typeof schema>
 
 const ChangePasswordCard = () => {
   // ** States
@@ -67,7 +77,7 @@ const ChangePasswordCard = () => {
     control,
     handleSubmit,
     formState: { errors }
-  } = useForm({ defaultValues, resolver: yupResolver(schema) })
+  } = useForm<FormValues>({ defaultValues, resolver: zodResolver(schema) })
 
   const handleClickShowCurrentPassword = () => {
     setValues({ ...values, showCurrentPassword: !values.showCurrentPassword })
@@ -81,7 +91,8 @@ const ChangePasswordCard = () => {
     setValues({ ...values, showConfirmNewPassword: !values.showConfirmNewPassword })
   }
 
-  const onPasswordFormSubmit = () => {
+  const onPasswordFormSubmit = (data: FormValues) => {
+    // اینجا می‌توانید درخواست api بزنید یا هر کاری که لازم است انجام دهید
     toast.success('Password Changed Successfully')
     reset(defaultValues)
   }
@@ -100,7 +111,6 @@ const ChangePasswordCard = () => {
                 <Controller
                   name='currentPassword'
                   control={control}
-                  rules={{ required: true }}
                   render={({ field: { value, onChange } }) => (
                     <OutlinedInput
                       value={value}
@@ -138,7 +148,6 @@ const ChangePasswordCard = () => {
                 <Controller
                   name='newPassword'
                   control={control}
-                  rules={{ required: true }}
                   render={({ field: { value, onChange } }) => (
                     <OutlinedInput
                       value={value}
@@ -174,7 +183,6 @@ const ChangePasswordCard = () => {
                 <Controller
                   name='confirmNewPassword'
                   control={control}
-                  rules={{ required: true }}
                   render={({ field: { value, onChange } }) => (
                     <OutlinedInput
                       value={value}

@@ -1,9 +1,9 @@
 // ** Type Imports
-import { NavLink, NavGroup, LayoutProps, NavSectionTitle } from '@core/layouts/types'
+import { LayoutProps, NavGroup, NavLink, NavSectionTitle } from '@core/layouts/types'
 
 // ** Custom Menu Components
-import VerticalNavLink from './VerticalNavLink'
 import VerticalNavGroup from './VerticalNavGroup'
+import VerticalNavLink from './VerticalNavLink'
 import VerticalNavSectionTitle from './VerticalNavSectionTitle'
 
 interface Props {
@@ -24,21 +24,21 @@ interface Props {
 const resolveNavItemComponent = (item: NavGroup | NavLink | NavSectionTitle) => {
   if ((item as NavSectionTitle).sectionTitle) return VerticalNavSectionTitle
   if ((item as NavGroup).children) return VerticalNavGroup
-
   return VerticalNavLink
 }
 
 const VerticalNavItems = (props: Props) => {
   // ** Props
   const { verticalNavItems } = props
-
   const RenderMenuItems = verticalNavItems?.map((item: NavGroup | NavLink | NavSectionTitle, index: number) => {
     const TagName: any = resolveNavItemComponent(item)
 
     return <TagName {...props} key={index} item={item} />
   })
 
-  return <>{RenderMenuItems}</>
+  return <div>{RenderMenuItems}
+
+  </div>
 }
 
 export default VerticalNavItems

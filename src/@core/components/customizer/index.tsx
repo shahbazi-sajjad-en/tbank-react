@@ -3,6 +3,7 @@ import { useState } from 'react'
 
 // ** Third Party Components
 import PerfectScrollbar from 'react-perfect-scrollbar'
+import { IoSettingsOutline } from "react-icons/io5";
 
 // ** MUI Imports
 import Radio from '@mui/material/Radio'
@@ -70,9 +71,8 @@ const ColorBox = styled(Box)<BoxProps>(({ theme }) => ({
   }
 }))
 
-const Customizer = () => {
+const Customizer = ({ open, setOpen }) => {
   // ** State
-  const [open, setOpen] = useState<boolean>(false)
 
   // ** Hook
   const { settings, saveSettings } = useSettings()
@@ -99,9 +99,6 @@ const Customizer = () => {
 
   return (
     <div className='customizer'>
-      <Toggler className='customizer-toggler' onClick={() => setOpen(true)}>
-        <Icon icon='tabler:settings' />
-      </Toggler>
       <Drawer open={open} hideBackdrop anchor='right' variant='persistent'>
         <Box
           className='customizer-header'

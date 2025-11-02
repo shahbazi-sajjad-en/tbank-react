@@ -665,20 +665,20 @@ mock.onGet('/pages/profile').reply(config => {
   return [200, data[tab]]
 })
 
-mock.onGet('/pages/profile-header').reply(() => {
-  return [200, data.profileHeader]
-})
+// mock.onGet('/pages/profile-header').reply(() => {
+//   return [200, data.profileHeader]
+// })
 
-mock.onGet('/pages/profile-table').reply(config => {
-  const { q = '' } = config.params ?? ''
-  const queryLowered = q.toLowerCase()
-  const filteredData = projectTable.filter(row => {
-    return (
-      row.name.toLowerCase().includes(queryLowered) ||
-      row.date.toLowerCase().includes(queryLowered) ||
-      row.leader.toLowerCase().includes(queryLowered)
-    )
-  })
+// mock.onGet('/pages/profile-table').reply(config => {
+//   const { q = '' } = config.params ?? ''
+//   const queryLowered = q.toLowerCase()
+//   const filteredData = projectTable.filter(row => {
+//     return (
+//       row.name.toLowerCase().includes(queryLowered) ||
+//       row.date.toLowerCase().includes(queryLowered) ||
+//       row.leader.toLowerCase().includes(queryLowered)
+//     )
+//   })
 
-  return [200, filteredData]
-})
+//   return [200, filteredData]
+// })

@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 8098",
+    "dev": "next dev -p 8090",
     "build": "next build",
-    "start": "next start -p 8098",
+    "start": "next start -p 8090",
     "lint": "eslint"
   },
   "dependencies": {
@@ -42,9 +42,9 @@
     "next": "15.5.3",
     "nprogress": "^0.2.0",
     "prismjs": "^1.30.0",
-    "react": "19.1.0",
+    "react": "^18.3.1",
     "react-apexcharts": "^1.8.0",
-    "react-dom": "19.1.0",
+    "react-dom": "^18.3.1",
     "react-hook-form": "^7.63.0",
     "react-hot-toast": "^2.6.0",
     "react-i18next": "^15.7.3",

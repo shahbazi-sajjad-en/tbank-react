@@ -1,8 +1,9 @@
 // ** React Imports
 import { ReactNode, ReactElement, useEffect } from 'react'
 
-// ** Next Import
-import { useRouter } from 'next/navigation'
+// ** Next Import (App Router)
+import { useRouter, usePathname } from 'next/navigation'
+
 // ** Hooks Import
 import { useAuth } from 'src/hooks/useAuth'
 
@@ -11,31 +12,18 @@ interface AuthGuardProps {
   fallback: ReactElement | null
 }
 
-const AuthGuard = (props: AuthGuardProps) => {
-  const { children, fallback } = props
+const AuthGuard = ({ children, fallback }: AuthGuardProps) => {
   const auth = useAuth()
   const router = useRouter()
+  const pathname = usePathname()
 
-  useEffect(
-    () => {
-      if (!router.isReady) {
-        return
-      }
-
-      if (auth.user === null && !window.localStorage.getItem('userData')) {
-        if (router.asPath !== '/') {
-          router.replace({
-            pathname: '/login',
-            query: { returnUrl: router.asPath }
-          })
-        } else {
-          router.replace('/login')
-        }
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [router.route]
-  )
+  useEffect(() => {
+    // اگر کاربر لاگین نیست و داده‌ای در localStorage نیست
+    if (auth.user === null && !window.localStorage.getItem('userData')) {
+      // هدایت به صفحه لاگین با returnUrl
+      router.replace(`/login?returnUrl=${encodeURIComponent(pathname)}`)
+    }
+  }, [auth.user, router, pathname])
 
   if (auth.loading || auth.user === null) {
     return fallback

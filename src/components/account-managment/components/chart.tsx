@@ -1,50 +1,81 @@
 // ** MUI Imports
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import {
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 
-// ** Icon Imports
-import Icon from 'src/@core/components/icon'
-
-interface LabelProp {
-  cx: number
-  cy: number
-  percent: number
-  midAngle: number
-  innerRadius: number
-  outerRadius: number
-}
 
 interface ChartProps {
-  availableBalance: number
-  blockedBalance: number
+  availableBalance: number | string;
+  blockedBalance: number | string;
+  creditBalance: number | string;
 }
 
-// برای محاسبه درصد و رنگ
-const renderCustomizedLabel = (props: LabelProp) => {
-  const { cx, cy, midAngle, innerRadius, outerRadius, percent } = props
-  const RADIAN = Math.PI / 180
-  const radius = innerRadius + (outerRadius - innerRadius) * 0.5
-  const x = cx + radius * Math.cos(-midAngle * RADIAN)
-  const y = cy + radius * Math.sin(-midAngle * RADIAN)
+// برچسب درصد
+const renderCustomizedLabel = (props: any) => {
+  const { cx, cy, midAngle, innerRadius, outerRadius, percent } = props;
+  const RADIAN = Math.PI / 180;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  if (percent === 0) return null;
 
   return (
-    <text x={x} y={y} fill='#fff' textAnchor='middle' dominantBaseline='central' fontSize={12}>
+    <text
+      x={x}
+      y={y}
+      fill="#fff"
+      textAnchor="middle"
+      dominantBaseline="central"
+      fontSize={12}
+    >
       {`${(percent * 100).toFixed(0)}%`}
     </text>
-  )
-}
+  );
+};
 
-const RechartsPieChart = ({ availableBalance, blockedBalance }: ChartProps) => {
-  const total = availableBalance + blockedBalance
+const RechartsPieChart = ({
+  availableBalance,
+  blockedBalance,
+  creditBalance,
+}: ChartProps) => {
+  // تبدیل به عدد
+  const available = Number(availableBalance) || 0;
+  const blocked = Number(blockedBalance) || 0;
+  const credit = Number(creditBalance) || 0;
+
+  const total = available + blocked + credit;
+  // اگر مجموع صفر بود یا یکی از مقادیر صفر بود، Recharts آن بخش را حذف می‌کند
+  // برای جلوگیری از حذف، مقادیر خیلی کوچک (epsilon) برای رسم حفظ می‌کنیم
+  const epsilon = 0.00001;
 
   const data = [
-    { name: 'موجودی قابل برداشت', value: availableBalance, color: '#24B364' },
-    { name: 'موجودی مسدود شده', value: blockedBalance, color: '#E64449' }
-  ]
+    {
+      name: "موجودی قابل برداشت",
+      value: available > 0 ? available : epsilon,
+      color: "#24B364",
+    },
+    {
+      name: "موجودی مسدود شده",
+      value: blocked > 0 ? blocked : epsilon,
+      color: "#E64449",
+    },
+    {
+      name: "موجودی اعتباری",
+      value: credit > 0 ? credit : epsilon,
+      color: "#FFB700",
+    },
+  ];
+
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
       <Box sx={{ height: 160, width: 160 }}>
         <ResponsiveContainer>
           <PieChart>
@@ -52,7 +83,7 @@ const RechartsPieChart = ({ availableBalance, blockedBalance }: ChartProps) => {
               data={data}
               innerRadius={60}
               outerRadius={80}
-              dataKey='value'
+              dataKey="value"
               labelLine={false}
               label={renderCustomizedLabel}
             >
@@ -63,37 +94,19 @@ const RechartsPieChart = ({ availableBalance, blockedBalance }: ChartProps) => {
             <Tooltip
               formatter={(value, name) => [
                 `${Number(value).toLocaleString()} ریال`,
-                name
+                name,
               ]}
             />
           </PieChart>
         </ResponsiveContainer>
       </Box>
 
-      {/* Legend زیر چارت */}
-      {/* <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
-        {data.map((item, i) => (
-          <Box
-            key={i}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              mx: 2,
-              '& svg': { mr: 1, color: item.color }
-            }}
-          >
-            <Icon icon='mdi:circle' fontSize='0.75rem' /> 
-             <Typography variant='body2'>{item.name}</Typography>
-          </Box>
-        ))}
-      </Box> */}
-
-      {/* نمایش مجموع
-      <Typography sx={{ mt: 1, fontSize: 12, color: '#666' }}>
+      {/* نمایش مجموع */}
+      <Typography sx={{ mt: 1, fontSize: 12, color: "#666" }}>
         مجموع: {total.toLocaleString()} ریال
-      </Typography> */}
+      </Typography>
     </Box>
-  )
-}
+  );
+};
 
-export default RechartsPieChart
+export default RechartsPieChart;

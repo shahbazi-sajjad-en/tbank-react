@@ -7,10 +7,7 @@ interface DataType {
 }
 
 export const BlockBalance = (data: DataType): Promise<any> => {
-  return httpservice
-    .post("/financial/block-balance", data)
-    .then((res) => {
-      return res;
-    })
-    .catch((err) => console.log(err));
+  return httpservice.post("/financial/block-balance", data).then((res) => {
+    return res;
+  });
 };

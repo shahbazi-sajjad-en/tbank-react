@@ -2,7 +2,6 @@
 import { ReactNode } from 'react'
 
 // ** MUI Imports
-import { Theme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 
 // ** Layout Imports
@@ -10,19 +9,21 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import Layout from 'src/@core/layouts/Layout'
 
 // ** Navigation Imports
-import VerticalNavItems from 'src/navigation/vertical'
 import HorizontalNavItems from 'src/navigation/horizontal'
+import VerticalNavItems from 'src/navigation/vertical'
 
 // ** Component Import
 // Uncomment the below line (according to the layout type) when using server-side menu
 // import ServerSideVerticalNavItems from './components/vertical/ServerSideNavItems'
 // import ServerSideHorizontalNavItems from './components/horizontal/ServerSideNavItems'
 
-import VerticalAppBarContent from './components/vertical/AppBarContent'
 import HorizontalAppBarContent from './components/horizontal/AppBarContent'
+import VerticalAppBarContent from './components/vertical/AppBarContent'
 
 // ** Hook Import
 import { useSettings } from 'src/@core/hooks/useSettings'
+import BreadCrumbs from 'src/@core/components/breadCrumbs'
+import { Card } from '@mui/material'
 
 interface Props {
   children: ReactNode
@@ -51,19 +52,16 @@ const UserLayout = ({ children, contentHeightFixed = true }: Props) => {
     settings.layout = 'vertical'
   }
 
- 
+
   return (
     <Layout
       hidden={hidden}
       settings={settings}
       saveSettings={saveSettings}
-      contentHeightFixed={contentHeightFixed}
+      contentHeightFixed={false}
       verticalLayoutProps={{
         navMenu: {
           navItems: VerticalNavItems()
-
-          // Uncomment the below line when using server-side menu in vertical layout and comment the above line
-          // navItems: verticalMenuItems
         },
         appBar: {
           content: props => (
@@ -90,7 +88,12 @@ const UserLayout = ({ children, contentHeightFixed = true }: Props) => {
         }
       })}
     >
-      {children}
+      <div >
+        <div className='mb-10 '>
+          <BreadCrumbs />
+        </div>
+          {children}
+      </div>
 
     </Layout>
   )

@@ -2,6 +2,8 @@
 "use client"
 
 import { useRef, useState } from 'react'
+import Customizer from 'src/@core/components/customizer'
+import Icon from '@core/components/icon'
 
 // ** MUI Imports
 import List from '@mui/material/List'
@@ -23,6 +25,9 @@ import VerticalNavHeader from './VerticalNavHeader'
 
 // ** Util Import
 import { hexToRGBA } from '@core/utils/hex-to-rgba'
+import { IoSettingsOutline } from 'react-icons/io5'
+import { useAuth } from 'src/hooks/useAuth'
+import { Divider } from '@mui/material'
 
 interface Props {
   navWidth: number
@@ -100,7 +105,7 @@ const Navigation = (props: Props) => {
     //   }
     // }
   }
-
+  const [open, setOpen] = useState(false)
   // ** Scroll Menu
   const scrollMenu = (container: any) => {
     if (beforeVerticalNavMenuContentPosition === 'static' || !beforeNavMenuContent) {
@@ -138,7 +143,13 @@ const Navigation = (props: Props) => {
     }
   }
 
+  const { logout } = useAuth()
+
   const ScrollWrapper = hidden ? Box : PerfectScrollbar
+
+  const handleLogout = () => {
+    logout()
+  }
 
   return (
     <Drawer {...props} navHover={navHover} setNavHover={setNavHover} navigationBorderWidth={navigationBorderWidth}>
@@ -147,19 +158,21 @@ const Navigation = (props: Props) => {
       {(beforeVerticalNavMenuContentPosition === 'static' || !beforeNavMenuContent) && (
         <StyledBoxForShadow ref={shadowRef} sx={{ background: shadowBgColor() }} />
       )}
+
+      {open && <Customizer open={open} setOpen={setOpen} />}
       <Box sx={{ position: 'relative', overflow: 'hidden' }}>
         {/* @ts-ignore */}
         <ScrollWrapper
           {...(hidden
             ? {
-                onScroll: (container: any) => scrollMenu(container),
-                sx: { height: '100%', overflowY: 'auto', overflowX: 'hidden' }
-              }
+              onScroll: (container: any) => scrollMenu(container),
+              sx: { height: '100%', overflowY: 'auto', overflowX: 'hidden' }
+            }
             : {
-                options: { wheelPropagation: false },
-                onScrollY: (container: any) => scrollMenu(container),
-                containerRef: (ref: any) => handleInfiniteScroll(ref)
-              })}
+              options: { wheelPropagation: false },
+              onScrollY: (container: any) => scrollMenu(container),
+              containerRef: (ref: any) => handleInfiniteScroll(ref)
+            })}
         >
           {beforeNavMenuContent && beforeVerticalNavMenuContentPosition === 'static'
             ? beforeNavMenuContent(props)
@@ -167,19 +180,43 @@ const Navigation = (props: Props) => {
           {userNavMenuContent ? (
             userNavMenuContent(props)
           ) : (
-            <List className='nav-items' >
-              <VerticalNavItems
-                navHover={navHover}
-                groupActive={groupActive}
-                setGroupActive={setGroupActive}
-                currentActiveGroup={currentActiveGroup}
-                setCurrentActiveGroup={setCurrentActiveGroup}
-                {...props}
-              />
-            </List>
+            <div className='flex flex-col gap-40 md:gap-40 lg:gap-40 xl:gap-60 '>
+              <List className='nav-items flex-1' >
+                <VerticalNavItems
+                  navHover={navHover}
+                  groupActive={groupActive}
+                  setGroupActive={setGroupActive}
+                  currentActiveGroup={currentActiveGroup}
+                  setCurrentActiveGroup={setCurrentActiveGroup}
+                  {...props}
+                />
+
+
+              </List>
+              <div className='fixed  bottom-0 mb-4 flex flex-col px-10 gap-4'>
+                <Divider className='!opacity-10 w-44' />
+
+                <div
+                  onClick={() => setOpen(true)}
+                  className='flex items-center gap-2 cursor-pointer hover:text-primary transition'
+                >
+                  <Icon icon='tabler:settings' />
+                  <span>تنظیمات</span>
+                </div>
+
+                <div
+                  className='flex items-center gap-2 cursor-pointer hover:text-red-600 transition'
+                  onClick={handleLogout}
+                >
+                  <Icon icon='tabler:logout' style={{ color: "red" }} />
+                  <span className='text-sm text-red-600'>خروج</span>
+                </div>
+              </div>
+            </div>
           )}
           {afterNavMenuContent && afterVerticalNavMenuContentPosition === 'static' ? afterNavMenuContent(props) : null}
         </ScrollWrapper>
+
       </Box>
       {afterNavMenuContent && afterVerticalNavMenuContentPosition === 'fixed' ? afterNavMenuContent(props) : null}
     </Drawer>

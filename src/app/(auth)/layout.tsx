@@ -16,17 +16,18 @@ import ReactHotToast from "src/@core/styles/libs/react-hot-toast"
 
 // Context Providers
 import { SettingsConsumer, SettingsProvider } from "src/@core/context/settingsContext"
-import { AuthProvider } from "src/context/AuthContext"
+// import { AuthProvider } from "src/context/AuthContext"
+import { AuthProvider } from '../../context/AuthContext'
 
 // Theme
-import ThemeComponent from "src/@core/theme/ThemeComponent"
+// import ThemeComponent from "src/@core/theme/ThemeComponent"
+import ThemeComponent from '../../@core/theme/ThemeComponent'
 
 
 // Others
-import { SessionProvider } from "next-auth/react"
 import { PersistGate } from "redux-persist/integration/react"
-import themeConfig from "src/configs/themeConfig"
 import BlankLayout from "src/@core/layouts/BlankLayout"
+import themeConfig from "src/configs/themeConfig"
 
 
 
@@ -55,34 +56,36 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   const authGuard = false
   const guestGuard = false
   return (
-    <CacheProvider value={clientSideEmotionCache}>
-      <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <SettingsProvider>
+    <html lang="fa" dir="rtl">
+      <body>
+        <CacheProvider value={clientSideEmotionCache}>
+          <Provider store={store}>
+            <PersistGate loading={null} persistor={persistor}>
+              <SettingsProvider>
 
-            <SettingsConsumer>
+                <SettingsConsumer>
 
-              {({ settings }) => (
-                <ThemeComponent settings={settings}>
-                  <AuthProvider>
-                    <Guard authGuard={authGuard} guestGuard={guestGuard}>
-                      <SessionProvider>
-                        <BlankLayout>{children}</BlankLayout>
+                  {({ settings }) => (
+                    <ThemeComponent settings={settings}>
+                      <AuthProvider>
+                        <Guard authGuard={authGuard} guestGuard={guestGuard}>
+                            <BlankLayout>{children}</BlankLayout>
 
-                      </SessionProvider>
-                    </Guard>
-                  </AuthProvider>
-                  <Toaster position={themeConfig.toastPosition} />
-                  <ReactHotToast />
-                </ThemeComponent>
+                        </Guard>
+                      </AuthProvider>
+                      <Toaster position={themeConfig.toastPosition} />
+                      <ReactHotToast />
+                    </ThemeComponent>
 
-              )}
-            </SettingsConsumer>
+                  )}
+                </SettingsConsumer>
 
-          </SettingsProvider>
-        </PersistGate>
-      </Provider>
-    </CacheProvider>
+              </SettingsProvider>
+            </PersistGate>
+          </Provider>
+        </CacheProvider>
+      </body>
+    </html>
 
   )
 }

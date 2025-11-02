@@ -11,6 +11,7 @@ import authConfig from 'src/configs/auth'
 
 // ** Types
 import { AuthValuesType, RegisterParams, LoginParams, ErrCallbackType, UserDataType } from './types'
+import { LogOut } from 'src/@api/logout'
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -97,7 +98,9 @@ const AuthProvider = ({ children }: Props) => {
     setUser(null)
     window.localStorage.removeItem('userData')
     window.localStorage.removeItem(authConfig.storageTokenKeyName)
-    router.push('/login')
+    LogOut().then((res) => {
+      router.push('/login')
+    }).catch((err) => err)
   }
 
   const handleRegister = (params: RegisterParams, errorCallback?: ErrCallbackType) => {
